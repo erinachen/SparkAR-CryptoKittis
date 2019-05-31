@@ -59,6 +59,7 @@ const Textures = require('Textures');
 
 // Store the URL we're sending the request to
 const url = 'https://api.cryptokitties.co/kitties?owner_wallet_address=0x12a0E25E62C1dBD32E505446062B26AECB65F028&limit=4&offset=0';
+const url2 = 'https://api.opensea.io/api/v1/assets/?format=json&order_by=current_price&order_direction=asc&owner=0x12a0E25E62C1dBD32E505446062B26AECB65F028';
 
 // Create a request object
 const request = {
@@ -69,6 +70,13 @@ const request = {
 
 };
 
+const request2 = {
+
+  // The HTTP Method of the request
+  // (https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods)
+  method: 'GET'
+
+};
 //==============================================================================
 // Send the request and log the results
 //==============================================================================
@@ -91,11 +99,46 @@ Networking.fetch(url, request).then(function(result) {
 }).then(function(json) {
 
   // Log the JSON obtained by the successful request
-  Diagnostics.log('Successfully sent - ' + json.kitties[0].image_url_png);
-  for (var i=0;i<3;i++){
+  
+  /*for (var i=0;i<3;i++){
     Diagnostics.log(i);
     Textures.get('externalTexture'+i).url = json.kitties[i].image_url_png;
+  }*/
+  Textures.get('externalTexture0').url = json.kitties[1].image_url_png;
+  Textures.get('externalTexture1').url = json.kitties[2].image_url_png;
+  
+  Diagnostics.log('Successfully sent - ' + json.kitties[2].image_url_png);
+}).catch(function(error) {
+
+  // Log any errors that may have happened with the request
+  Diagnostics.log('Error - ' + error.message);
+
+});
+
+Networking.fetch(url2, request2).then(function(result) {
+
+  // Check the status of the result
+  // (https://developer.mozilla.org/en-US/docs/Web/HTTP/Status)
+  if ((result.status >= 200) && (result.status < 300)) {
+
+    // If the request was successful, chain the JSON forward
+    return result.json();
+
   }
+
+  // If the request was not successful, throw an error
+  throw new Error('HTTP status code - ' + result.status);
+
+}).then(function(json) {
+
+  // Log the JSON obtained by the successful request
+  
+  /*for (var i=0;i<3;i++){
+    Diagnostics.log(i);
+    Textures.get('externalTexture'+i).url = json.kitties[i].image_url_png;
+  }*/
+  Textures.get('externalTexture2').url = json.assets[18].image_url;
+  Diagnostics.log('Successfully sent - ' + json.assets[18].image_url);
 }).catch(function(error) {
 
   // Log any errors that may have happened with the request
